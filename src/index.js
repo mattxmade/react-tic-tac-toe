@@ -90,7 +90,7 @@ class Game extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      history: [{ squares: Array(9).fill(null) }],
+      history: [{ squares: Array(9).fill(null), positions: ["", ""] }],
       stepNumber: 0,
       xIsNext: true,
     };
@@ -105,9 +105,11 @@ class Game extends React.Component {
       return;
     }
 
+    const coodinates = findPosition(i);
+
     squares[i] = this.state.xIsNext ? "X" : "O";
     this.setState({
-      history: history.concat([{ squares: squares }]),
+      history: history.concat([{ squares: squares, positions: coodinates }]),
       stepNumber: history.length,
       xIsNext: !this.state.xIsNext,
     });
@@ -128,10 +130,12 @@ class Game extends React.Component {
     // history
     const moves = history.map((step, move) => {
       const desc = move ? "Go to move #" + move : "Go to game start";
+      const row = step.positions[0] ? " row: " + step.positions[0] + " " : " ";
+      const col = step.positions[1] ? " col: " + step.positions[1] + " " : " ";
 
       return (
         <li key={move}>
-          <button onClick={() => this.jumpTo(move)}>{desc}</button>
+          <button onClick={() => this.jumpTo(move)}>{desc + row + col}</button>
         </li>
       );
     });
@@ -181,6 +185,30 @@ function calculateWinner(squares) {
     }
   }
   return null;
+}
+
+function findPosition(cellNum) {
+  const row = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+  ];
+
+  const col = [
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+  ];
+
+  const result = [];
+  const positionFlow = Array(3).fill(null);
+
+  positionFlow.forEach((array, index) => {
+    if (row[index].includes(cellNum)) result.push(index + 1);
+    if (col[index].includes(cellNum)) result.push(index + 1);
+  });
+
+  return result;
 }
 
 // ========================================
